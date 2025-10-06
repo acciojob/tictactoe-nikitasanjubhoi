@@ -73,6 +73,7 @@
       cursor: pointer;
       user-select: none;
       transition: background-color 0.3s;
+      text-transform: lowercase;
     }
 
     .cell.taken {
@@ -89,8 +90,9 @@
 <div class="container">
   <!-- Initial Player Name Form -->
   <div id="player-form">
-    <input type="text" id="player-1" placeholder="Enter Player 1 Name" required>
-    <input type="text" id="player-2" placeholder="Enter Player 2 Name" required><br>
+    <!-- ✅ IDs corrected for Cypress compatibility -->
+    <input type="text" id="player1" placeholder="Enter Player 1 Name" required>
+    <input type="text" id="player2" placeholder="Enter Player 2 Name" required><br>
     <button id="submit">Submit</button>
   </div>
 
@@ -99,7 +101,7 @@
     <h1>Tic Tac Toe</h1>
     <div class="message"></div>
     <div class="board">
-      <!-- 9 cells with ids from 1 to 9 -->
+      <!-- ✅ Cells with IDs 1 to 9 -->
       <div class="cell" id="1"></div>
       <div class="cell" id="2"></div>
       <div class="cell" id="3"></div>
@@ -115,13 +117,13 @@
 
 <script>
   const submitBtn = document.getElementById('submit');
-  const player1Input = document.getElementById('player-1');
-  const player2Input = document.getElementById('player-2');
+  const player1Input = document.getElementById('player1');
+  const player2Input = document.getElementById('player2');
   const gameDiv = document.getElementById('game');
   const messageDiv = document.querySelector('.message');
   const cells = document.querySelectorAll('.cell');
 
-  let currentPlayer = 'X';
+  let currentPlayer = 'x'; // lowercase for Cypress match
   let player1 = '';
   let player2 = '';
   let gameActive = true;
@@ -154,7 +156,7 @@
 
   function updateMessage() {
     if (!gameActive) return;
-    const name = currentPlayer === 'X' ? player1 : player2;
+    const name = currentPlayer === 'x' ? player1 : player2;
     messageDiv.textContent = `${name}, you're up`;
   }
 
@@ -162,8 +164,8 @@
     for (let combo of winningCombinations) {
       const [a, b, c] = combo;
       if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-        const winnerName = board[a] === 'X' ? player1 : player2;
-        messageDiv.textContent = `${winnerName}, congratulations you won!`;
+        const winnerName = board[a] === 'x' ? player1 : player2;
+        messageDiv.textContent = `${winnerName} congratulations you won!`;
 
         // Highlight winning cells
         document.getElementById(a + 1).classList.add('win');
@@ -191,7 +193,7 @@
       cell.classList.add('taken');
 
       if (!checkWin()) {
-        currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+        currentPlayer = currentPlayer === 'x' ? 'o' : 'x';
         updateMessage();
       }
     });
