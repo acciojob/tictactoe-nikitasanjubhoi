@@ -3,37 +3,200 @@
 <head>
   <meta charset="UTF-8">
   <title>Tic Tac Toe</title>
-  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+      background-color: #d0e7f9; /* Light blue background */
+    }
+
+    .container {
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    #player-form {
+      margin-bottom: 20px;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      width: 45%;
+      margin: 5px;
+    }
+
+    #submit {
+      padding: 10px 20px;
+      margin-top: 10px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    #submit:hover {
+      background-color: #45a049;
+    }
+
+    #game {
+      display: none;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    .message {
+      margin: 15px 0;
+      font-size: 18px;
+      font-weight: bold;
+      color: #444;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-template-rows: repeat(3, 100px);
+      gap: 5px;
+      justify-content: center;
+    }
+
+    .cell {
+      background-color: white;
+      border: 2px solid #333;
+      font-size: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.3s;
+    }
+
+    .cell.taken {
+      pointer-events: none;
+    }
+
+    .cell.win {
+      background-color: #90ee90 !important; /* Light green for winning cells */
+    }
+  </style>
 </head>
 <body>
-  <div class="container">
 
-    <!-- Player name input -->
-    <div id="player-input">
-      <input type="text" id="player1" placeholder="Enter Player 1 Name" />
-      <input type="text" id="player2" placeholder="Enter Player 2 Name" />
-      <button id="submit">Submit</button>
-    </div>
-
-    <!-- Game section (hidden initially) -->
-    <div id="game" style="display: none;">
-      <h1>Tic Tac Toe</h1>
-      <div class="message"></div>
-      <div class="board">
-        <div class="cell" id="1"></div>
-        <div class="cell" id="2"></div>
-        <div class="cell" id="3"></div>
-        <div class="cell" id="4"></div>
-        <div class="cell" id="5"></div>
-        <div class="cell" id="6"></div>
-        <div class="cell" id="7"></div>
-        <div class="cell" id="8"></div>
-        <div class="cell" id="9"></div>
-      </div>
-    </div>
-
+<div class="container">
+  <!-- Initial Player Name Form -->
+  <div id="player-form">
+    <input type="text" id="player-1" placeholder="Enter Player 1 Name" required>
+    <input type="text" id="player-2" placeholder="Enter Player 2 Name" required><br>
+    <button id="submit">Submit</button>
   </div>
 
-  <script src="script.js"></script>
+  <!-- Game Area -->
+  <div id="game">
+    <h1>Tic Tac Toe</h1>
+    <div class="message"></div>
+    <div class="board">
+      <!-- 9 cells with ids from 1 to 9 -->
+      <div class="cell" id="1"></div>
+      <div class="cell" id="2"></div>
+      <div class="cell" id="3"></div>
+      <div class="cell" id="4"></div>
+      <div class="cell" id="5"></div>
+      <div class="cell" id="6"></div>
+      <div class="cell" id="7"></div>
+      <div class="cell" id="8"></div>
+      <div class="cell" id="9"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const submitBtn = document.getElementById('submit');
+  const player1Input = document.getElementById('player-1');
+  const player2Input = document.getElementById('player-2');
+  const gameDiv = document.getElementById('game');
+  const messageDiv = document.querySelector('.message');
+  const cells = document.querySelectorAll('.cell');
+
+  let currentPlayer = 'X';
+  let player1 = '';
+  let player2 = '';
+  let gameActive = true;
+  let board = ["", "", "", "", "", "", "", "", ""];
+
+  const winningCombinations = [
+    [0,1,2],
+    [3,4,5],
+    [6,7,8],
+    [0,3,6],
+    [1,4,7],
+    [2,5,8],
+    [0,4,8],
+    [2,4,6]
+  ];
+
+  submitBtn.addEventListener('click', () => {
+    player1 = player1Input.value.trim();
+    player2 = player2Input.value.trim();
+
+    if (player1 === '' || player2 === '') {
+      alert("Please enter names for both players.");
+      return;
+    }
+
+    document.getElementById('player-form').style.display = 'none';
+    gameDiv.style.display = 'block';
+    updateMessage();
+  });
+
+  function updateMessage() {
+    if (!gameActive) return;
+    const name = currentPlayer === 'X' ? player1 : player2;
+    messageDiv.textContent = `${name}, you're up`;
+  }
+
+  function checkWin() {
+    for (let combo of winningCombinations) {
+      const [a, b, c] = combo;
+      if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+        const winnerName = board[a] === 'X' ? player1 : player2;
+        messageDiv.textContent = `${winnerName}, congratulations you won!`;
+
+        // Highlight winning cells
+        document.getElementById(a + 1).classList.add('win');
+        document.getElementById(b + 1).classList.add('win');
+        document.getElementById(c + 1).classList.add('win');
+
+        gameActive = false;
+        return true;
+      }
+    }
+    if (!board.includes("")) {
+      messageDiv.textContent = `It's a draw!`;
+      gameActive = false;
+      return true;
+    }
+    return false;
+  }
+
+  cells.forEach((cell, index) => {
+    cell.addEventListener('click', () => {
+      if (!gameActive || board[index] !== "") return;
+
+      board[index] = currentPlayer;
+      cell.textContent = currentPlayer;
+      cell.classList.add('taken');
+
+      if (!checkWin()) {
+        currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+        updateMessage();
+      }
+    });
+  });
+</script>
+
 </body>
 </html>
